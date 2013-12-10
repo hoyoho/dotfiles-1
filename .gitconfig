@@ -1,0 +1,10 @@
+[user]
+    name = Pavlos Ratis
+    email = dastergon@gentoo.org
+    signingkey = 3A051746
+[core]
+    editor = vim
+[color]
+    ui = true
+[push]
+    default = simple

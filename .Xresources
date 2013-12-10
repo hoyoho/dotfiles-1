@@ -1,0 +1,69 @@
+!-*- Transparency -*-
+URxvt.depth: 32
+URxvt.background: [98]#000000
+
+!-*- Appearence -*-
+URxvt*font:xft:Monospace:pixelsize=15,style=regural
+URxvt*background: #000000
+URxvt*foreground: #FFFFFF
+URxvt*termName: xterm
+URxvt*letterSpace: 0
+
+!-*- Xft settings -*-
+Xft*dpi:             96
+Xft*antialias:       True
+Xft*hinting:         Full
+Xft*hintstyle: hintslight
+
+!-*- Scrollbar -*-
+URxvt.scrollstyle: rxvt
+URxvt.scrollBar: False
+URxvt*scrollWithBuffer: true
+URxvt*saveLines: 8192
+
+!-*- Perl extensions -*-
+URxvt*perl-ext-common:default,clipboard,keyboard-select,matcher,tabbed,url-select
+URxvt*keysym.M-u:     perl:url-select:select_next
+URxvt*url-launcher:      /usr/bin/firefox-bin
+URxvt*matcher.button: 1
+URxvt*colorUL: #4682B4
+URxvt*keysym.M-Escape:perl:keyboard-select:activate
+URxvt*keysym.M-c:     perl:clipboard:copy
+URxvt*keysym.M-v:     perl:clipboard:paste
+URxvt*keysym.M-C-v:   perl:clipboard:paste_escaped
+URxvt.iso14755: false
+URxvt.iso14755_52: false
+!URxvt*copyCommand:   xclip -i -selection clipboard
+!URxvt*pasteCommand:  xclip -o -selection clipboard 
+
+!-*- Tabs -*-
+URxvt.tabbed.tabbar-fg: 2
+URxvt.tabbed.tabbar-bg: 0
+URxvt.tabbed.tab-fg:    3
+URxvt.tabbed.tab-bg:    0
+
+!-*- Colorscheme -*-
+! modified Tango Colors
+! source: https://wiki.gentoo.org/wiki/Rxvt-unicode
+
+!!red
+*color1:        #CC0000
+*color9:        #EF2929
+!!green
+*color2:        #4E9A06
+*color10:        #8AE234
+!!yellow
+*color3:        #C4A000
+*color11:        #FCE94F
+!!blue
+*color4:        #3465A4
+*color12:        #729FCF
+!!magenta
+*color5:        #75507B
+*color13:        #AD7FA8
+!!cyan
+*color6:        #06989A
+*color14:        #34E2E2
+!!white
+*color7:        #D3D7CF
+*color15:        #EEEEEC
