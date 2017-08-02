@@ -2,6 +2,8 @@
 set nocompatible
 filetype off
 
+set clipboard=unnamed
+
 set noshelltemp
 
 " set the runtime path to include Vundle and initialize
@@ -10,8 +12,9 @@ call vundle#begin()
 
 " let Vundle manage Vundle, required
 Plugin 'gmarik/Vundle.vim'
-Bundle 'tomasr/molokai'
-Plugin 'bling/vim-airline'
+Plugin 'altercation/vim-colors-solarized.git'
+Plugin 'vim-airline/vim-airline'
+Plugin 'vim-airline/vim-airline-themes'
 Plugin 'scrooloose/nerdtree'
 Plugin 'Xuyuanp/nerdtree-git-plugin'
 Plugin 'airblade/vim-gitgutter'
@@ -19,15 +22,10 @@ Plugin 'tpope/vim-fugitive'
 Plugin 'kien/ctrlp.vim'
 Plugin 'tpope/vim-surround'
 Plugin 'davidhalter/jedi-vim'
-Plugin 'MarcWeber/vim-addon-mw-utils'
-Plugin 'tomtom/tlib_vim'
-Plugin 'garbas/vim-snipmate'
-Plugin 'honza/vim-snippets'
 Plugin 'sjl/gundo.vim'
 Plugin 'vim-pandoc/vim-pandoc'
-Plugin 'jceb/vim-orgmode'
-Bundle 'mattn/webapi-vim'
-Bundle 'mattn/gist-vim'
+Plugin 'mattn/webapi-vim'
+Plugin 'mattn/gist-vim'
 Plugin 'fatih/vim-go'
 Plugin 'pangloss/vim-javascript'
 Plugin 'rust-lang/rust.vim'
@@ -37,16 +35,23 @@ Plugin 'ervandew/supertab'
 call vundle#end()
 
 " Background
-set t_Co=256
+set t_Co=16
 syntax enable
+
 set background=dark
-let g:molokai_original = 1
-colorscheme molokai
+"let g:solarized_termcolors=16
+let g:solarized_termtrans=1
+colorscheme solarized
+
+"let g:molokai_original = 1
+"colorscheme molokai
 let g:rehash256 = 1
+
 " Status line
 set laststatus=2
 set noshowmode
 " Settings for vim-airline
+let g:airline_theme='solarized'
 let g:airline_powerline_fonts = 1
 let g:airline#extensions#tabline#enabled = 1
 
@@ -154,6 +159,7 @@ nnoremap <C-J> <C-W><C-J>
 nnoremap <C-K> <C-W><C-K>
 nnoremap <C-L> <C-W><C-L>
 nnoremap <C-H> <C-W><C-H>
+
 " Gist
 let g:gist_clip_command = 'pbcopy' " Copy to clipboard
 let g:gist_detect_filetype = 1 " Detect filetype by default
@@ -162,3 +168,5 @@ let g:gist_post_private = 1 " private gists by default
 
 nmap <S-Enter> O<Esc>
 nmap <CR> o<Esc>
+
+au BufNewFile report*.md r ~/.vim/skeleton.md
