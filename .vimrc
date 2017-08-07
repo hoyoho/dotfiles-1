@@ -19,9 +19,9 @@ Plugin 'scrooloose/nerdtree'
 Plugin 'Xuyuanp/nerdtree-git-plugin'
 Plugin 'airblade/vim-gitgutter'
 Plugin 'tpope/vim-fugitive'
-Plugin 'kien/ctrlp.vim'
+Plugin 'ctrlpvim/ctrlp.vim'
 Plugin 'tpope/vim-surround'
-Plugin 'davidhalter/jedi-vim'
+"Plugin 'davidhalter/jedi-vim'
 Plugin 'sjl/gundo.vim'
 Plugin 'vim-pandoc/vim-pandoc'
 Plugin 'mattn/webapi-vim'
@@ -30,8 +30,10 @@ Plugin 'fatih/vim-go'
 Plugin 'pangloss/vim-javascript'
 Plugin 'rust-lang/rust.vim'
 Plugin 'ervandew/supertab'
-"Plugin 'terryma/vim-multiple-cursors'
-"Plugin 'Valloric/YouCompleteMe'
+Plugin 'nathanaelkane/vim-indent-guides'
+Plugin 'dhruvasagar/vim-table-mode'
+Plugin 'Valloric/YouCompleteMe'
+Plugin 'tpope/vim-repeat'
 call vundle#end()
 
 " Background
@@ -86,14 +88,6 @@ set foldnestmax=10      " 10 nested fold max
 nnoremap <space> za
 set foldmethod=indent " fold based on indent level
 
-" move to beginning/end of line
-nnoremap B ^
-nnoremap E $
-
-" $/^ doesn't do anything
-nnoremap $ <nop>
-nnoremap ^ <nop>
-
 " highlight last inserted text
 nnoremap gV `[v`]
 
@@ -142,6 +136,10 @@ autocmd BufRead,BufNewFile *.strace set filetype=strace
 " Gundo
 nnoremap <F5> :GundoToggle<CR>
 
+" Tagbar
+nmap <F8> :TagbarToggle<CR>
+
+
 " autosave
 "let g:auto_save = 1  " enable AutoSave on Vim startup
 
@@ -159,7 +157,6 @@ nnoremap <C-J> <C-W><C-J>
 nnoremap <C-K> <C-W><C-K>
 nnoremap <C-L> <C-W><C-L>
 nnoremap <C-H> <C-W><C-H>
-
 " Gist
 let g:gist_clip_command = 'pbcopy' " Copy to clipboard
 let g:gist_detect_filetype = 1 " Detect filetype by default
@@ -169,4 +166,22 @@ let g:gist_post_private = 1 " private gists by default
 nmap <S-Enter> O<Esc>
 nmap <CR> o<Esc>
 
+" indent guides
+"let g:indent_guides_guide_size = 1
+"let g:indent_guides_color_change_percent = 3
+"let g:indent_guides_enable_on_vim_startup = 1
+
+" table-mode
+let g:table_mode_corner="|"
+
+" bind K to grep word under cursor
+nnoremap K :grep! "\b<C-R><C-W>\b"<CR>:cw<CR>
+
 au BufNewFile report*.md r ~/.vim/skeleton.md
+
+" YouCompleteMe
+let g:ycm_collect_identifiers_from_tags_files = 1 " Let YCM read tags from Ctags file
+let g:ycm_use_ultisnips_completer = 1 " Default 1, just ensure
+let g:ycm_seed_identifiers_with_syntax = 1 " Completion for programming language's keyword
+let g:ycm_complete_in_comments = 1 " Completion in comments
+let g:ycm_complete_in_strings = 1 " Completion in string
