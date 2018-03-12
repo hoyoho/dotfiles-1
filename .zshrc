@@ -1,27 +1,15 @@
 #!/bin/zsh
 
 # Aliases
-alias ls='ls --color=auto -h'
+alias python='python2'
+alias ls='ls -G -h' # mac os x
+# alias ls='ls --color=auto -h'
 alias l='ls -la'
-alias grep='grep --color=auto'
-alias cp='cp --reflink=auto'
 alias history='fc -l 1'
 
 alias ..='cd ..'
 alias cd..='cd ..'
 alias cd...='cd ../..'
-
-# fun
-alias please='sudo'
-
-# vim fans united
-alias :q="exit"
-alias :wq="exit"
-
-# colors everywhere
-if type -p colordiff &> /dev/null ; then alias diff="colordiff" ; fi
-if type -p colorcvs &> /dev/null ; then alias cvs="colorcvs" ; fi
-if type -p colorgcc &> /dev/null ; then alias gcc="colorgcc" ; fi
 
 # Env vars
 export COLORTERM=yes
@@ -30,27 +18,12 @@ export PAGER="less"
 export EDITOR="vim"
 export LESS="-R"
 
-# GNU Colors
-[ -f /etc/DIR_COLORS ] && eval $(dircolors -b /etc/DIR_COLORS)
-export ZLSCOLORS="${LS_COLORS}"
-
-# Gentoo Dev settings
-if [ $UID -ne 0 ]; then
-	export ECHANGELOG_USER="Pavlos Ratis <dastergon@gentoo.org>"
-	# KeyChain
-	keychain --dir ~/.ssh/.keychain ~/.ssh/id_rsa
-	source ~/.ssh/.keychain/$HOST-sh
-fi
-
-# Completion
-autoload -U compinit; compinit
-setopt auto_name_dirs
-
-# Prompt and colors
-autoload -U promptinit; promptinit
-setopt prompt_subst
-autoload -U colors; colors
-prompt gentoo
+# Go specific env vars
+export GOPATH=$HOME/go
+export GOROOT=/usr/local/opt/go/libexec
+export PATH=$PATH:$GOPATH/bin
+export PATH=$PATH:$GOROOT/bin
+export PATH="/usr/local/sbin:$PATH"
 
 # History
 HISTSIZE=1500
@@ -59,59 +32,53 @@ SAVEHIST=$HISTSIZE
 setopt hist_ignore_all_dups # ignore duplicated entries
 setopt hist_ignore_space #ignore space
 
-# Appearance
-zstyle ':completion:*:descriptions' format '%U%B%d%b%u'
-zstyle ':completion:*:warnings' format '%BSorry, no matches for: %d%b'
-zstyle ':completion:*' menu select=1
-zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
-
 # Extended globbing
 setopt extendedglob
 
 # Key bindnings
+bindkey -e
+# Option-Right
+bindkey '\e\e[C' forward-word
+# Option-Left
+bindkey '\e\e[D' backward-word
 
-# filter history by command
-[[ -n "${key[PageUp]}"   ]]  && bindkey  "${key[PageUp]}"    history-beginning-search-backward
-[[ -n "${key[PageDown]}" ]]  && bindkey  "${key[PageDown]}"  history-beginning-search-forward
- 
-# Custom functions 
+# Completion
+autoload -U compinit; compinit
+setopt shwordsplit
+setopt auto_name_dirs
 
-# Git + zsh prompt ( https://gist.github.com/joshdick/4415470 )
+autoload -U promptinit; promptinit
+autoload -U colors; colors
 
-# prompt
-THEME_GIT_PROMPT_PREFIX="%{$reset_color%}%{$fg[green]%}["
-THEME_GIT_PROMPT_SUFFIX="]%{$reset_color%}"
-THEME_GIT_PROMPT_DIRTY="%{$fg[red]%}*%{$reset_color%}"
-THEME_GIT_PROMPT_CLEAN=""
+# PROMPT
+SPACESHIP_PROMPT_ORDER=(
+  time
+  user
+  host
+  dir
+  git
+  line_sep
+  char
+)
 
-# show git branch/tag, or name-rev if on detached head
-parse_git_branch() {
-  (command git symbolic-ref -q HEAD || command git name-rev --name-only --no-undefined --always HEAD) 2>/dev/null
-}
+SPACESHIP_TIME_SHOW=true
 
-# show red star if there are uncommitted changes
-parse_git_dirty() {
-  if command git diff-index --quiet HEAD 2> /dev/null; then
-    echo "$THEME_GIT_PROMPT_CLEAN"
-  else
-    echo "$THEME_GIT_PROMPT_DIRTY"
-  fi
-}
+# Set Spaceship ZSH as a prompt
+prompt spaceship
 
-# if in a git repo, show dirty indicator + git branch
-git_custom_status() {
-  local git_where="$(parse_git_branch)"
-  [ -n "$git_where" ] && echo "$(parse_git_dirty)$THEME_GIT_PROMPT_PREFIX${git_where#(refs/heads/|tags/)}$THEME_GIT_PROMPT_SUFFIX"
-}
-# right-hand prompt
-RPS1='$(git_custom_status) $EPS1'
+# Appearance
+zstyle ':completion:*' completer _expand _complete _ignored _correct _approximate
+zstyle ':completion:*' format 'Completing %d'
+zstyle ':completion:*' list-colors ''
+zstyle ':completion:*' list-prompt %SAt %p: Hit TAB for more, or the character to insert%s
+zstyle ':completion:*' matcher-list '' 'm:{[:lower:]}={[:upper:]}' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' 'r:|[._-]=** r:|=**'
+zstyle ':completion:*' max-errors 2
+zstyle ':completion:*' menu select=5
+zstyle ':completion:*' prompt '%e'
+zstyle ':completion:*' select-prompt %SScrolling active: current selection at %p%s
 
-# taken from oh-my-zsh
-function zsh_stats() {
-    history | awk '{CMD[$2]++;count++;}END { for (a in CMD)print CMD[a] " " CMD[a]/count*100 "% " a;}' | grep -v "./" | column -c3 -s " " -t | sort -nr | nl |  head -n20
-}
-
-# cool custom function - http://dev.gentoo.org/~steev/files/zshrc 
+# Custom functions
+# cool custom function - http://dev.gentoo.org/~steev/files/zshrc
 extract() {
    if [[ -z "$1" ]] ; then
       print -P "usage: \e[1;36mextract\e[1;0m < filename >"
@@ -135,29 +102,3 @@ extract() {
       echo "File ('$1') does not exist!"
    fi
 }
-
-# thanks to hackernews
-export MARKPATH=$HOME/.marks
-
-function jump {
-    cd -P "$MARKPATH/$1" 2>/dev/null || echo "No such mark: $1"
-}
-
-function mark {
-    mkdir -p "$MARKPATH"; ln -s "$(pwd)" "$MARKPATH/$1"
-}
-
-function unmark {
-    rm -i "$MARKPATH/$1"
-}
-
-function marks {
-    ls -l "$MARKPATH" | sed 's/  / /g' | cut -d' ' -f9- | sed 's/ -/\t-/g' && echo
-}
-
-function _completemarks {
-    reply=($(ls $MARKPATH))
-}
-
-compctl -K _completemarks jump
-compctl -K _completemarks unmark
