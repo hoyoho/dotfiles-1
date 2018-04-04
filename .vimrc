@@ -1,55 +1,67 @@
+" This must be first, it changes other options as side effect
+set nocompatible " be iMproved, required
+filetype off " required
+filetype plugin indent on " detect file types
+
 " Set the runtime path to include Vundle and initialize
 set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
 
 " let Vundle manage Vundle, required
 Plugin 'gmarik/Vundle.vim'
-Plugin 'joshdick/onedark.vim'
+Plugin 'altercation/vim-colors-solarized'
 Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
-Plugin 'terryma/vim-multiple-cursors'
-Plugin 'ntpeters/vim-better-whitespace'
-Plugin 'skywind3000/asyncrun.vim'
-Plugin 'airblade/vim-gitgutter'
-Plugin 'tpope/vim-fugitive'
-Plugin 'scrooloose/nerdtree'
+Plugin 'scrooloose/nerdtree'i n'
 Plugin 'Xuyuanp/nerdtree-git-plugin'
-Plugin 'fatih/vim-go'
-Plugin 'rust-lang/rust.vim'
+Plugin 'airblade/vim-gitgutter'
 Plugin 'ctrlpvim/ctrlp.vim'
+Plugin 'tpope/vim-fugitive'
+Plugin 'terryma/vim-multiple-cursors'
+Plugin 'fatih/vim-go'
+Plugin 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+Plugin 'Shougo/neosnippet.vim'
+Plugin 'Shougo/neosnippet-snippets'
+Plugin 'zchee/deoplete-go'
+Plugin 'zchee/deoplete-jedi'
+Plugin 'rust-lang/rust.vim'
 Plugin 'tpope/vim-surround'
 Plugin 'vim-pandoc/vim-pandoc'
 Plugin 'mattn/webapi-vim'
 Plugin 'mattn/gist-vim'
 Plugin 'godlygeek/tabular'
 Plugin 'elzr/vim-json'
-Plugin 'Shougo/deoplete.nvim'
-Plugin 'Shougo/neosnippet.vim'
-Plugin 'zchee/deoplete-go'
+Plugin 'plasticboy/vim-markdown'
+Plugin 'christoomey/vim-tmux-navigator'
+Plugin 'ntpeters/vim-better-whitespace'
 call vundle#end()
-
-set nocompatible " This must be first, it changes other options as side effect
-filetype off
-filetype plugin indent on " detect file types
 
 let mapleader="," " leader is comma
 
 set clipboard=unnamed " use one clipboard
 
-" Look and Feel
-syntax enable
+" Colorscheme
+syntax on
 set background=dark
-let g:onedark_termcolors=16
-colorscheme onedark
+set t_Co=256
+let g:solarized_termcolors=16
+let g:solarized_termtrans=1
+colorscheme solarized
+
 " Status line
-set laststatus=2
-let g:airline_theme='onedark'
-let g:airline_powerline_fonts = 1
-let g:airline#extensions#tabline#enabled = 1
+set laststatus=2 " Show status bar by default
+let g:airline_theme='solarized'
+let g:airline_powerline_fonts = 0
+let g:airline#extensions#tabline#enabled = 0 " Enable top tabline
+let g:airline#extensions#branch#enabled = 1
+let g:airline_left_sep = ''
+let g:airline_right_sep = ''
+let g:airline_section_warning = ''
+let g:airline_section_y = ''
+let g:airline_section_x = ''
 
 " Settings
 set number " line numbers
-set cursorline " Highlight the screen line of the cursor
 set report=0 " Always report the number of lines changed
 set showcmd " Show command in the bottom-right corner
 set showmode " Show current mode
@@ -64,8 +76,10 @@ set nobackup " Disable backup and swap files
 set nowritebackup
 set noswapfile " Don't use swapfile
 set noshowmatch " Do not show matching brackets by flickering
+set noerrorbells " No beeps
 set ruler " Show the cursor position all the time
 set mouse=a " Enable mouse inside vim
+set completeopt-=preview " remove the preview window
 
 " Open new split panes to right and bottom, which feels more natural
 set splitbelow
@@ -102,14 +116,19 @@ set undolevels=1000
 set wildignore=*.swp,*.bak,*.pyc,*.class " ignore extensions
 
 " Speed up syntax highlighting
-set nocursorcolumn
-set nocursorline
+set nocursorcolumn " do not highlight column
+set nocursorline " do not highlight line
+syntax sync minlines=256 " start highlighting from 256 lines backwards
 
 " Quicker window movement
 nnoremap <C-j> <C-w>j
 nnoremap <C-k> <C-w>k
 nnoremap <C-h> <C-w>h
 nnoremap <C-l> <C-w>l
+
+" Creating splits
+nnoremap <leader>v :vsplit<cr>
+nnoremap <leader>h :split<cr>
 
 " Move up and down on splitted lines
 map <Up> gk
@@ -119,6 +138,12 @@ map j gj
 
 " Leave insert mode
 imap jk <ESC>l
+
+" Turn off search highlight
+nnoremap <leader><space> :nohlsearch<CR>
+
+" Matches are highlighted.
+nnoremap <silent> <Enter> :nohl<Enter>
 
 " Buffer prev/next
 nnoremap <C-x> :bnext<CR>
@@ -132,26 +157,37 @@ noremap <Down> <NOP>
 noremap <Left> <NOP>
 noremap <Right> <NOP>
 
-" Turn off search highlight
-nnoremap <leader><space> :nohlsearch<CR>
-
-" Matches are highlighted.
-nnoremap <silent> <Enter> :nohl<Enter>
-
 " Don't highlight the cursor line on the quickfix window
 autocmd BufReadPost quickfix setlocal nocursorline
 
-" Python-specific settings
-autocmd BufNewFile,BufRead *.py setlocal tabstop=4 softtabstop=4 shiftwidth=4 textwidth=80 smarttab expandtab
+" Python settings
+au FileType python set expandtab
+au FileType python set smarttab
+au FileType python set shiftwidth=4
+au FileType python set softtabstop=4
+au FileType python set tabstop=4
 
 " Go settings
-au BufNewFile,BufRead *.go setlocal noet ts=4 sw=4 sts=4
+au FileType go set noexpandtab
+au FileType go set shiftwidth=4
+au FileType go set softtabstop=4
+au FileType go set tabstop=4
+
+" YAML settings
+au FileType yaml set expandtab
+au FileType yaml set shiftwidth=2
+au FileType yaml set softtabstop=2
+au FileType yaml set tabstop=2
+
+" Markdown settings
+au FileType markdown set expandtab
+au FileType markdown set shiftwidth=4
+au FileType markdown set softtabstop=4
+au FileType markdown set tabstop=4
+au FileType markdown set syntax=markdown
 
 " Strace highlighting
 autocmd BufRead,BufNewFile *.strace set filetype=strace
-
-" Markdown
-autocmd BufNewFile,BufReadPost *.md set filetype=markdown
 
 " Autoremove whitespaces
 autocmd BufWritePre * :%s/\s\+$//e
@@ -159,6 +195,12 @@ autocmd BufWritePre * :%s/\s\+$//e
 " Autoload postmortems
 au BufNewFile report*.md r ~/.vim/skeleton.md
 au BufNewFile postmortem-*.md 0r ~/postmortem-templates/templates/postmortem-template-srebook.md
+
+if has("autocmd")
+    augroup templates
+    autocmd BufNewFile *.sh 0r ~/.vim/templates/skeleton.sh
+    augroup END
+endif
 
 " Treat <li> and <p> tags like the block tags they are
 let g:html_indent_tags = 'li\|p'
@@ -179,7 +221,6 @@ function! s:compile_and_run()
 endfunction
 
 " Deoplete
-" https://github.com/jessfraz/.vim/blob/master/vimrc
 if has('nvim')
   let g:deoplete#enable_at_startup = 1
   let g:deoplete#ignore_sources = {}
@@ -205,11 +246,23 @@ let g:ctrlp_clear_cache_on_exit = 0
 let g:ctrlp_cache_dir = $HOME.'/.cache/ctrlp'
 
 " NERDTree
-map <C-n> :NERDTreeToggle<CR>
+nmap <C-n> :NERDTreeToggle<CR>
+noremap <Leader>n :NERDTreeToggle<cr>
+noremap <Leader>f :NERDTreeFind<cr>
 let NERDTreeShowHidden=1 " Show hidden files
+"  Files to ignore
+let NERDTreeIgnore = [
+    \ '\.git$',
+    \ '\.vim$',
+    \ '\~$',
+    \ '\.pyc$',
+    \ '^\.DS_Store$',
+    \ '^node_modules$',
+    \ '^.ropeproject$',
+    \ '^__pycache__$'
+\]
 " Close vim if the only window left open is a NERDTree
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
-let NERDTreeIgnore=['\.vim$', '\~$', '\.git$', '.DS_Store']
 
 " Gist
 let g:gist_clip_command = 'pbcopy' " Copy to clipboard
@@ -222,6 +275,7 @@ set rtp+=$GOPATH/src/github.com/golang/lint/misc/vim
 let g:go_fmt_fail_silently = 0
 let g:go_fmt_command = "goimports"
 let g:go_snippet_engine = "neosnippet"
+let b:goimports_vendor_compatible = 1
 let g:go_autodetect_gopath = 1
 let g:go_term_enabled = 1
 let g:go_textobj_include_function_doc = 1
@@ -275,3 +329,9 @@ augroup go
   autocmd Filetype go command! -bang AV call go#alternate#Switch(<bang>0, 'vsplit')
   autocmd Filetype go command! -bang AS call go#alternate#Switch(<bang>0, 'split')
 augroup END
+
+" NeoSnippet Plugin key-mappings.
+" Note: It must be "imap" and "smap".  It uses <Plug> mappings.
+imap <C-k>     <Plug>(neosnippet_expand_or_jump)
+smap <C-k>     <Plug>(neosnippet_expand_or_jump)
+xmap <C-k>     <Plug>(neosnippet_expand_target)
