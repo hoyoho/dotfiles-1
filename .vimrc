@@ -6,34 +6,40 @@ filetype plugin indent on " detect file types
 " Set the runtime path to include Vundle and initialize
 set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
-
 " let Vundle manage Vundle, required
 Plugin 'gmarik/Vundle.vim'
-Plugin 'altercation/vim-colors-solarized'
 Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
-Plugin 'scrooloose/nerdtree'
-Plugin 'Xuyuanp/nerdtree-git-plugin'
-Plugin 'airblade/vim-gitgutter'
-Plugin 'ctrlpvim/ctrlp.vim'
-Plugin 'tpope/vim-fugitive'
-Plugin 'terryma/vim-multiple-cursors'
-Plugin 'fatih/vim-go'
 Plugin 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-Plugin 'Shougo/neosnippet.vim'
-Plugin 'Shougo/neosnippet-snippets'
 Plugin 'zchee/deoplete-go'
 Plugin 'zchee/deoplete-jedi'
+Plugin 'scrooloose/nerdtree'
+Plugin 'airblade/vim-gitgutter'
+Plugin 'Xuyuanp/nerdtree-git-plugin'
+Plugin 'fatih/vim-go'
 Plugin 'rust-lang/rust.vim'
+Plugin 'terryma/vim-multiple-cursors'
+Plugin 'SirVer/ultisnips'
+Plugin 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --bin' }
+Plugin 'junegunn/fzf.vim'
+Plugin 'christoomey/vim-tmux-navigator'
+Plugin 'tpope/vim-fugitive'
 Plugin 'tpope/vim-surround'
 Plugin 'vim-pandoc/vim-pandoc'
-Plugin 'mattn/webapi-vim'
-Plugin 'mattn/gist-vim'
 Plugin 'godlygeek/tabular'
-Plugin 'elzr/vim-json'
+Plugin 'easymotion/vim-easymotion'
 Plugin 'plasticboy/vim-markdown'
-Plugin 'christoomey/vim-tmux-navigator'
 Plugin 'ntpeters/vim-better-whitespace'
+Plugin 'AndrewRadev/splitjoin.vim'
+Plugin 'ConradIrwin/vim-bracketed-paste'
+Plugin 'ekalinin/Dockerfile.vim', {'for' : 'Dockerfile'}
+Plugin 'elzr/vim-json', {'for' : 'json'}
+Plugin 't9md/vim-choosewin'
+Plugin 'ervandew/supertab'
+Plugin 'MattesGroeger/vim-bookmarks'
+Plugin 'stephpy/vim-yaml'
+Plugin 'mhartington/oceanic-next'
+Plugin 'jiangmiao/auto-pairs'
 call vundle#end()
 
 let mapleader="," " leader is comma
@@ -44,14 +50,22 @@ set clipboard=unnamed " use one clipboard
 syntax on
 set background=dark
 set t_Co=256
-let g:solarized_termcolors=16
-let g:solarized_termtrans=1
-colorscheme solarized
+
+if (has("termguicolors"))
+ set termguicolors
+endif
+
+let g:oceanic_next_terminal_bold = 1
+let g:oceanic_next_terminal_italic = 1
+colorscheme OceanicNext
+"let g:solarized_termcolors=16
+"let g:solarized_termtrans=1
+"colorscheme solarized
 
 " Status line
 set laststatus=2 " Show status bar by default
-let g:airline_theme='solarized'
-let g:airline_powerline_fonts = 0
+let g:airline_theme='oceanicnext'
+let g:airline_powerline_fonts = 1
 let g:airline#extensions#tabline#enabled = 0 " Enable top tabline
 let g:airline#extensions#branch#enabled = 1
 let g:airline_left_sep = ''
@@ -80,6 +94,7 @@ set noerrorbells " No beeps
 set ruler " Show the cursor position all the time
 set mouse=a " Enable mouse inside vim
 set completeopt-=preview " remove the preview window
+set rnu "set hybrid relative line numbers
 
 " Open new split panes to right and bottom, which feels more natural
 set splitbelow
@@ -126,6 +141,22 @@ nnoremap <C-k> <C-w>k
 nnoremap <C-h> <C-w>h
 nnoremap <C-l> <C-w>l
 
+" Some useful quickfix shortcuts
+":cc      see the current error
+":cn      next error
+":cp      previous error
+":clist   list all errors
+map <C-n> :cn<CR>
+map <C-m> :cp<CR>
+
+" Mappings to move lines
+nnoremap <A-j> :m .+1<CR>==
+nnoremap <A-k> :m .-2<CR>==
+inoremap <A-j> <Esc>:m .+1<CR>==gi
+inoremap <A-k> <Esc>:m .-2<CR>==gi
+vnoremap <A-j> :m '>+1<CR>gv=gv
+vnoremap <A-k> :m '<-2<CR>gv=gvj
+
 " Creating splits
 nnoremap <leader>v :vsplit<cr>
 nnoremap <leader>h :split<cr>
@@ -138,6 +169,9 @@ map j gj
 
 " Leave insert mode
 imap jk <ESC>l
+
+" Close quickfix easily
+nnoremap <leader>a :cclose<CR>
 
 " Turn off search highlight
 nnoremap <leader><space> :nohlsearch<CR>
@@ -192,16 +226,6 @@ autocmd BufRead,BufNewFile *.strace set filetype=strace
 " Autoremove whitespaces
 autocmd BufWritePre * :%s/\s\+$//e
 
-" Autoload postmortems
-au BufNewFile report*.md r ~/.vim/skeleton.md
-au BufNewFile postmortem-*.md 0r ~/postmortem-templates/templates/postmortem-template-srebook.md
-
-if has("autocmd")
-    augroup templates
-    autocmd BufNewFile *.sh 0r ~/.vim/templates/skeleton.sh
-    augroup END
-endif
-
 " Treat <li> and <p> tags like the block tags they are
 let g:html_indent_tags = 'li\|p'
 
@@ -220,36 +244,12 @@ function! s:compile_and_run()
     endif
 endfunction
 
-" Deoplete
-if has('nvim')
-  let g:deoplete#enable_at_startup = 1
-  let g:deoplete#ignore_sources = {}
-  let g:deoplete#ignore_sources._ = ['buffer', 'member', 'tag', 'file', 'neosnippet']
-  let g:deoplete#sources#go#sort_class = ['func', 'type', 'var', 'const']
-  let g:deoplete#sources#go#align_class = 1
-
-  " Use partial fuzzy matches like YouCompleteMe
-  call deoplete#custom#set('_', 'matchers', ['matcher_fuzzy'])
-  call deoplete#custom#set('_', 'converters', ['converter_remove_paren'])
-  call deoplete#custom#set('_', 'disabled_syntaxes', ['Comment', 'String'])
-endif
-
-" CtrlP
-let g:ctrlp_cmd = 'CtrlP'
-let g:ctrlp_working_path_mode = 'ra'
-let g:ctrlp_max_height = 10		" Maxiumum height of match window
-let g:ctrlp_switch_buffer = 'et'	" Jump to a file if it's open already
-let g:ctrlp_mruf_max=450 		" Number of recently opened files
-let g:ctrlp_max_files=0  		" Do not limit the number of searchable files
-let g:ctrlp_use_caching = 1
-let g:ctrlp_clear_cache_on_exit = 0
-let g:ctrlp_cache_dir = $HOME.'/.cache/ctrlp'
-
 " NERDTree
 nmap <C-n> :NERDTreeToggle<CR>
 noremap <Leader>n :NERDTreeToggle<cr>
 noremap <Leader>f :NERDTreeFind<cr>
 let NERDTreeShowHidden=1 " Show hidden files
+
 "  Files to ignore
 let NERDTreeIgnore = [
     \ '\.git$',
@@ -264,17 +264,68 @@ let NERDTreeIgnore = [
 " Close vim if the only window left open is a NERDTree
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 
-" Gist
-let g:gist_clip_command = 'pbcopy' " Copy to clipboard
-let g:gist_detect_filetype = 1 " Detect filetype by default
-let g:gist_post_private = 1 " private gists by default
+" vim-multiple-cursor
+let g:multi_cursor_use_default_mapping=0
+let g:multi_cursor_next_key='<C-i>'
+let g:multi_cursor_prev_key='<C-y>'
+let g:multi_cursor_skip_key='<C-b>'
+let g:multi_cursor_quit_key='<Esc>'
+
+" Called once right before you start selecting multiple cursors
+function! Multiple_cursors_before()
+  if exists(':NeoCompleteLock')==2
+    exe 'NeoCompleteLock'
+  endif
+endfunction
+
+" Called once only when the multiple selection is canceled (default <Esc>)
+function! Multiple_cursors_after()
+  if exists(':NeoCompleteUnlock')==2
+    exe 'NeoCompleteUnlock'
+  endif
+endfunction
+
+" Deoplete
+if has('nvim')
+  let g:deoplete#enable_at_startup = 1
+  let g:deoplete#ignore_sources = {}
+  let g:deoplete#ignore_sources._ = ['buffer', 'member', 'tag', 'file', 'neosnippet']
+  let g:deoplete#sources#go#sort_class = ['func', 'type', 'var', 'const']
+  let g:deoplete#sources#go#align_class = 1
+
+  " Use partial fuzzy matches like YouCompleteMe
+  call deoplete#custom#source('_', 'matchers', ['matcher_fuzzy'])
+  call deoplete#custom#source('_', 'converters', ['converter_remove_paren'])
+  call deoplete#custom#source('_', 'disabled_syntaxes', ['Comment', 'String'])
+endif
+
+ " <TAB>: completion.
+inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
+
+" CtrlP
+"let g:ctrlp_cmd = 'CtrlPMixed'
+"let g:ctrlp_working_path_mode = 'ra'
+"let g:ctrlp_max_height = 10		" Maxiumum height of match window
+"let g:ctrlp_switch_buffer = 'et'	" Jump to a file if it's open already
+"let g:ctrlp_mruf_max=450 		" Number of recently opened files
+"let g:ctrlp_max_files=0  		" Do not limit the number of searchable files
+"let g:ctrlp_use_caching = 1
+"let g:ctrlp_clear_cache_on_exit = 0
+"let g:ctrlp_cache_dir = $HOME.'/.cache/ctrlp'
+
+"if executable('ag')
+  " Use Ag over Grep
+ " set grepprg=ag\ --nogroup\ --nocolor
+
+  " Use ag in CtrlP for listing files. Lightning fast and respects .gitignore
+  "let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
+"endif
 
 " vim-go
 set rtp+=$GOPATH/src/github.com/golang/lint/misc/vim
 
 let g:go_fmt_fail_silently = 0
 let g:go_fmt_command = "goimports"
-let g:go_snippet_engine = "neosnippet"
 let b:goimports_vendor_compatible = 1
 let g:go_autodetect_gopath = 1
 let g:go_term_enabled = 1
@@ -294,7 +345,9 @@ let g:go_highlight_extra_types = 0
 let g:go_highlight_operators = 0
 let g:go_highlight_build_constraints = 1
 
-" Run :GoBuild or :GoTestCompile based on the go file
+au BufRead,BufNewFile *.gohtml set filetype=gohtmltmpl
+
+" => Run :GoBuild or :GoTestCompile based on the go file
 function! s:build_go_files()
   let l:file = expand('%')
   if l:file =~# '^\f\+_test\.go$'
@@ -304,7 +357,6 @@ function! s:build_go_files()
   endif
 endfunction
 
-" Build and run a Go program with <leader>b and <leader>r
 au FileType go nmap <leader>b :<C-u>call <SID>build_go_files()<CR>
 au FileType go nmap <Leader>c <Plug>(go-coverage-toggle)
 au FileType go nmap <Leader>d <Plug>(go-doc)
@@ -330,8 +382,35 @@ augroup go
   autocmd Filetype go command! -bang AS call go#alternate#Switch(<bang>0, 'split')
 augroup END
 
-" NeoSnippet Plugin key-mappings.
-" Note: It must be "imap" and "smap".  It uses <Plug> mappings.
-imap <C-k>     <Plug>(neosnippet_expand_or_jump)
-smap <C-k>     <Plug>(neosnippet_expand_or_jump)
-xmap <C-k>     <Plug>(neosnippet_expand_target)
+" ==================== Completion + Snippet ====================
+let g:SuperTabDefaultCompletionType = "context"
+let g:UltiSnipsExpandTrigger="<tab>"
+let g:UltiSnipsJumpForwardTrigger="<tab>"
+let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
+
+
+" ==================== FZF ====================
+let g:fzf_command_prefix = 'Fzf'
+let g:fzf_layout = { 'down': '~20%' }
+
+" search
+nmap <C-p> :FzfHistory<cr>
+imap <C-p> <esc>:<C-u>FzfHistory<cr>
+
+" search across files in the current directory
+nmap <C-b> :FzfFiles<cr>
+imap <C-b> <esc>:<C-u>FzfFiles<cr>
+
+let g:rg_command = '
+  \ rg --column --line-number --no-heading --fixed-strings --ignore-case --no-ignore --hidden --follow --color "always"
+  \ -g "*.{js,json,php,md,styl,jade,html,config,py,cpp,c,go,hs,rb,conf}"
+  \ -g "!{.git,node_modules,vendor}/*" '
+
+command! -bang -nargs=* Rg
+  \ call fzf#vim#grep(
+  \   'rg --column --line-number --no-heading --color=always '.shellescape(<q-args>), 1,
+  \   <bang>0 ? fzf#vim#with_preview('up:60%')
+  \           : fzf#vim#with_preview('right:50%:hidden', '?'),
+  \   <bang>0)
+
+command! -bang -nargs=* F call fzf#vim#grep(g:rg_command .shellescape(<q-args>), 1, <bang>0)
