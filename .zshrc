@@ -1,6 +1,7 @@
 #!/bin/zsh
 
 # Aliases
+alias vim='nvim'
 alias python='python2'
 alias ls='ls -G -h' # mac os x
 # alias ls='ls --color=auto -h'
@@ -102,3 +103,10 @@ extract() {
       echo "File ('$1') does not exist!"
    fi
 }
+
+# kubectl autocomplete
+if [ $commands[kubectl] ]; then
+  source <(kubectl completion zsh)
+fi
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
