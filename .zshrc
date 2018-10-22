@@ -53,13 +53,14 @@ autoload -U colors; colors
 
 # PROMPT
 SPACESHIP_PROMPT_ORDER=(
-  time
-  user
-  host
+  #time
+  #user
+  #host
   dir
   git
-  line_sep
+  #line_sep
   char
+
 )
 
 SPACESHIP_TIME_SHOW=true
