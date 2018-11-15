@@ -10,6 +10,7 @@ call vundle#begin()
 Plugin 'gmarik/Vundle.vim'
 Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
+Plugin 'mhartington/oceanic-next'
 Plugin 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 Plugin 'zchee/deoplete-go'
 Plugin 'zchee/deoplete-jedi'
@@ -18,8 +19,9 @@ Plugin 'airblade/vim-gitgutter'
 Plugin 'Xuyuanp/nerdtree-git-plugin'
 Plugin 'fatih/vim-go'
 Plugin 'rust-lang/rust.vim'
-Plugin 'terryma/vim-multiple-cursors'
 Plugin 'SirVer/ultisnips'
+Plugin 'elzr/vim-json', {'for' : 'json'}
+Plugin 'stephpy/vim-yaml'
 Plugin 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --bin' }
 Plugin 'junegunn/fzf.vim'
 Plugin 'christoomey/vim-tmux-navigator'
@@ -27,18 +29,15 @@ Plugin 'tpope/vim-fugitive'
 Plugin 'tpope/vim-surround'
 Plugin 'vim-pandoc/vim-pandoc'
 Plugin 'godlygeek/tabular'
-Plugin 'easymotion/vim-easymotion'
 Plugin 'plasticboy/vim-markdown'
 Plugin 'ntpeters/vim-better-whitespace'
-Plugin 'AndrewRadev/splitjoin.vim'
 Plugin 'ConradIrwin/vim-bracketed-paste'
 Plugin 'ekalinin/Dockerfile.vim', {'for' : 'Dockerfile'}
-Plugin 'elzr/vim-json', {'for' : 'json'}
 Plugin 't9md/vim-choosewin'
 Plugin 'ervandew/supertab'
 Plugin 'MattesGroeger/vim-bookmarks'
-Plugin 'stephpy/vim-yaml'
-Plugin 'mhartington/oceanic-next'
+Plugin 'easymotion/vim-easymotion'
+Plugin 'AndrewRadev/splitjoin.vim'
 Plugin 'jiangmiao/auto-pairs'
 call vundle#end()
 
@@ -58,9 +57,6 @@ endif
 let g:oceanic_next_terminal_bold = 1
 let g:oceanic_next_terminal_italic = 1
 colorscheme OceanicNext
-"let g:solarized_termcolors=16
-"let g:solarized_termtrans=1
-"colorscheme solarized
 
 " Status line
 set laststatus=2 " Show status bar by default
@@ -94,7 +90,16 @@ set noerrorbells " No beeps
 set ruler " Show the cursor position all the time
 set mouse=a " Enable mouse inside vim
 set completeopt-=preview " remove the preview window
-set rnu "set hybrid relative line numbers
+set number relativenumber " set hybrid relative line numbers
+
+augroup numbertoggle
+  autocmd!
+  autocmd BufEnter,FocusGained,InsertLeave * set relativenumber
+  autocmd BufLeave,FocusLost,InsertEnter   * set norelativenumber
+augroup END
+
+set maxmempattern=20000 " increase max memory for large files
+set viminfo='1000 " Set oldfiles to 1000 last recently opened files
 
 " Open new split panes to right and bottom, which feels more natural
 set splitbelow
@@ -141,6 +146,10 @@ nnoremap <C-k> <C-w>k
 nnoremap <C-h> <C-w>h
 nnoremap <C-l> <C-w>l
 
+" Visual linewise up and down by default (and use gj gk to go quicker)
+noremap j gj
+noremap k gk
+
 " Some useful quickfix shortcuts
 ":cc      see the current error
 ":cn      next error
@@ -157,18 +166,31 @@ inoremap <A-k> <Esc>:m .-2<CR>==gi
 vnoremap <A-j> :m '>+1<CR>gv=gv
 vnoremap <A-k> :m '<-2<CR>gv=gvj
 
+" Increment/Decrement
+nnoremap <A-a> <C-a>
+nnoremap <A-x> <C-x>
+
+" Save or exit quickly
+nnoremap <leader>w :w!<cr>
+nnoremap <silent> <leader>q :q!<CR>
+
+" Create empty buffers
+nnoremap <C-n> :vnew<CR>
+nnoremap <leader>n :new<CR>
+
 " Creating splits
 nnoremap <leader>v :vsplit<cr>
 nnoremap <leader>h :split<cr>
 
-" Move up and down on splitted lines
-map <Up> gk
-map <Down> gj
-map k gk
-map j gj
+" Buffer prev/next
+nnoremap <C-x> :bnext<CR>
+nnoremap <C-z> :bprev<CR>
 
-" Leave insert mode
-imap jk <ESC>l
+" Breaking the habit
+noremap <Up> <NOP>
+noremap <Down> <NOP>
+noremap <Left> <NOP>
+noremap <Right> <NOP>
 
 " Close quickfix easily
 nnoremap <leader>a :cclose<CR>
@@ -179,17 +201,11 @@ nnoremap <leader><space> :nohlsearch<CR>
 " Matches are highlighted.
 nnoremap <silent> <Enter> :nohl<Enter>
 
-" Buffer prev/next
-nnoremap <C-x> :bnext<CR>
-nnoremap <C-z> :bprev<CR>
+" Highlight last inserted text
+nnoremap gV `[v`]
 
-nnoremap gV `[v`] " Highlight last inserted text
-
-" Breaking the habit
-noremap <Up> <NOP>
-noremap <Down> <NOP>
-noremap <Left> <NOP>
-noremap <Right> <NOP>
+" Do not show q: window
+map q: :q
 
 " Don't highlight the cursor line on the quickfix window
 autocmd BufReadPost quickfix setlocal nocursorline
@@ -197,9 +213,9 @@ autocmd BufReadPost quickfix setlocal nocursorline
 " Python settings
 au FileType python set expandtab
 au FileType python set smarttab
-au FileType python set shiftwidth=4
-au FileType python set softtabstop=4
-au FileType python set tabstop=4
+au FileType python set shiftwidth=2
+au FileType python set softtabstop=2
+au FileType python set tabstop=2
 
 " Go settings
 au FileType go set noexpandtab
@@ -219,6 +235,9 @@ au FileType markdown set shiftwidth=4
 au FileType markdown set softtabstop=4
 au FileType markdown set tabstop=4
 au FileType markdown set syntax=markdown
+
+" Tmux
+autocmd BufNewFile,BufRead .tmux.conf*,tmux.conf* setf tmux
 
 " Strace highlighting
 autocmd BufRead,BufNewFile *.strace set filetype=strace
@@ -245,7 +264,6 @@ function! s:compile_and_run()
 endfunction
 
 " NERDTree
-nmap <C-n> :NERDTreeToggle<CR>
 noremap <Leader>n :NERDTreeToggle<cr>
 noremap <Leader>f :NERDTreeFind<cr>
 let NERDTreeShowHidden=1 " Show hidden files
@@ -302,41 +320,27 @@ endif
  " <TAB>: completion.
 inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
 
-" CtrlP
-"let g:ctrlp_cmd = 'CtrlPMixed'
-"let g:ctrlp_working_path_mode = 'ra'
-"let g:ctrlp_max_height = 10		" Maxiumum height of match window
-"let g:ctrlp_switch_buffer = 'et'	" Jump to a file if it's open already
-"let g:ctrlp_mruf_max=450 		" Number of recently opened files
-"let g:ctrlp_max_files=0  		" Do not limit the number of searchable files
-"let g:ctrlp_use_caching = 1
-"let g:ctrlp_clear_cache_on_exit = 0
-"let g:ctrlp_cache_dir = $HOME.'/.cache/ctrlp'
-
-"if executable('ag')
-  " Use Ag over Grep
- " set grepprg=ag\ --nogroup\ --nocolor
-
-  " Use ag in CtrlP for listing files. Lightning fast and respects .gitignore
-  "let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
-"endif
+" vim-choosewin
+" invoke with '-'
+nmap  -  <Plug>(choosewin)
 
 " vim-go
 set rtp+=$GOPATH/src/github.com/golang/lint/misc/vim
 
 let g:go_fmt_fail_silently = 0
 let g:go_fmt_command = "goimports"
-let b:goimports_vendor_compatible = 1
 let g:go_autodetect_gopath = 1
 let g:go_term_enabled = 1
-let g:go_textobj_include_function_doc = 1
-let g:go_auto_sameids = 1 " Automatically highlight matching identifiers.
+let g:go_test_prepend_name = 1
 let g:go_list_type = "quickfix"
-let g:go_test_timeout = '10s'
+let g:go_info_mode = "gocode"
+let g:go_def_mode = "godef"
+let g:go_auto_type_info = 0
+let g:go_auto_sameids = 1 " Automatically highlight matching identifiers.
+let g:go_echo_command_info = 1
 
-let g:go_metalinter_autosave = 1 " Call metalinter after-save
-let g:go_auto_type_info = 1 " Show the information - status line is updated automatically
 let g:go_metalinter_enabled = ['vet', 'golint', 'errcheck']
+" let g:go_template_autocreate = 0
 
 let g:go_highlight_space_tab_error = 0
 let g:go_highlight_array_whitespace_error = 0
@@ -344,8 +348,14 @@ let g:go_highlight_trailing_whitespace_error = 0
 let g:go_highlight_extra_types = 0
 let g:go_highlight_operators = 0
 let g:go_highlight_build_constraints = 1
+let g:go_highlight_types = 0
+let g:go_highlight_operators = 1
+let g:go_highlight_format_strings = 0
+let g:go_highlight_function_calls = 0
+let g:go_gocode_propose_source = 1
 
-au BufRead,BufNewFile *.gohtml set filetype=gohtmltmpl
+nmap <C-g> :GoDecls<cr>
+imap <C-g> <esc>:<C-u>GoDecls<cr>
 
 " => Run :GoBuild or :GoTestCompile based on the go file
 function! s:build_go_files()
@@ -357,17 +367,33 @@ function! s:build_go_files()
   endif
 endfunction
 
-au FileType go nmap <leader>b :<C-u>call <SID>build_go_files()<CR>
-au FileType go nmap <Leader>c <Plug>(go-coverage-toggle)
-au FileType go nmap <Leader>d <Plug>(go-doc)
-au FileType go nmap <leader>dt  <Plug>(go-test-compile)
-au FileType go nmap <Leader>e <Plug>(go-rename)
-au FileType go nmap <Leader>i <Plug>(go-info)
-au FileType go nmap <Leader>l <Plug>(go-metalinter)
-au FileType go nmap <leader>r  <Plug>(go-run)
-au FileType go nmap <Leader>s <Plug>(go-def-split)
-au FileType go nmap <leader>t  <Plug>(go-test)
-au FileType go nmap <Leader>v <Plug>(go-def-vertical)
+augroup go
+  autocmd!
+  autocmd FileType go nmap <silent> <leader>b :<C-u>call <SID>build_go_files()<CR>
+  autocmd FileType go nmap <silent> <Leader>c <Plug>(go-coverage-toggle)
+  autocmd FileType go nmap <silent> <Leader>d <Plug>(go-def-tab)
+  autocmd FileType go nmap <silent> <leader>e  <Plug>(go-install)
+  autocmd FileType go nmap <silent> <Leader>i <Plug>(go-info)
+  autocmd FileType go nmap <silent> <Leader>l <Plug>(go-metalinter)
+  autocmd FileType go nmap <silent> <leader>r  <Plug>(go-run)
+  autocmd FileType go nmap <silent> <Leader>s <Plug>(go-def-split)
+  autocmd FileType go nmap <silent> <leader>t  <Plug>(go-test)
+  autocmd FileType go nmap <silent> <Leader>v <Plug>(go-def-vertical)
+  autocmd FileType go nmap <silent> <Leader>x <Plug>(go-doc-vertical)
+
+  autocmd Filetype go command! -bang A call go#alternate#Switch(<bang>0, 'edit')
+  autocmd Filetype go command! -bang AV call go#alternate#Switch(<bang>0, 'vsplit')
+  autocmd Filetype go command! -bang AS call go#alternate#Switch(<bang>0, 'split')
+  autocmd Filetype go command! -bang AT call go#alternate#Switch(<bang>0, 'tabe')
+augroup END
+
+" create a go doc comment based on the word under the cursor
+function! s:create_go_doc_comment()
+  norm "zyiw
+  execute ":put! z"
+  execute ":norm I// \<Esc>$"
+endfunction
+nnoremap <leader>ui :<C-u>call <SID>create_go_doc_comment()<CR>
 
 if has('nvim')
   au FileType go nmap <leader>rt <Plug>(go-run-tab)
@@ -375,23 +401,27 @@ if has('nvim')
   au FileType go nmap <Leader>rv <Plug>(go-run-vertical)
 endif
 
-augroup go
-  autocmd!
-  autocmd Filetype go command! -bang A call go#alternate#Switch(<bang>0, 'edit')
-  autocmd Filetype go command! -bang AV call go#alternate#Switch(<bang>0, 'vsplit')
-  autocmd Filetype go command! -bang AS call go#alternate#Switch(<bang>0, 'split')
-augroup END
+au BufRead,BufNewFile *.gohtml set filetype=gohtmltmpl
 
-" ==================== Completion + Snippet ====================
+" Completion + Snippet
 let g:SuperTabDefaultCompletionType = "context"
 let g:UltiSnipsExpandTrigger="<tab>"
 let g:UltiSnipsJumpForwardTrigger="<tab>"
 let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
 
 
-" ==================== FZF ====================
+" vim-markdown
+let g:vim_markdown_folding_disabled = 1
+let g:vim_markdown_fenced_languages = ['go=go', 'viml=vim', 'bash=sh']
+let g:vim_markdown_conceal = 0
+let g:vim_markdown_toml_frontmatter = 1
+let g:vim_markdown_frontmatter = 1
+let g:vim_markdown_new_list_item_indent = 2
+let g:vim_markdown_no_extensions_in_markdown = 1
+
+" FZF
 let g:fzf_command_prefix = 'Fzf'
-let g:fzf_layout = { 'down': '~20%' }
+let g:fzf_layout = { 'down': '~30%' }
 
 " search
 nmap <C-p> :FzfHistory<cr>
