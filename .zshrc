@@ -1,19 +1,21 @@
-#!/bin/zsh
+#!/bin/env zsh
+
+source /usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+
+if [ "$TMUX" = "" ]; then tmux; fi
 
 # Aliases
 alias vim='nvim'
-alias python='python2'
 alias ls='ls -G -h' # mac os x
 # alias ls='ls --color=auto -h'
 alias l='ls -la'
 alias history='fc -l 1'
-
 alias ..='cd ..'
 alias cd..='cd ..'
 alias cd...='cd ../..'
+alias k='kubectl'
 
 # Env vars
-export COLORTERM=yes
 export CC=gcc
 export PAGER="less"
 export EDITOR="vim"
@@ -60,11 +62,9 @@ SPACESHIP_PROMPT_ORDER=(
   git
   #line_sep
   char
-
 )
 
 SPACESHIP_TIME_SHOW=true
-
 # Set Spaceship ZSH as a prompt
 prompt spaceship
 
@@ -87,17 +87,17 @@ extract() {
       print -P "       Extract the file specified based on the extension"
    elif [[ -f $1 ]] ; then
       case ${(L)1} in
-         *.tar.bz2)  tar -jxvf $1	;;
-         *.tar.gz)   tar -zxvf $1	;;
-         *.bz2)      bunzip2 $1	   ;;
-         *.gz)       gunzip $1	   ;;
+         *.tar.bz2)  tar -jxvf $1       ;;
+         *.tar.gz)   tar -zxvf $1       ;;
+         *.bz2)      bunzip2 $1    ;;
+         *.gz)       gunzip $1     ;;
          *.jar)      unzip $1       ;;
-         *.rar)      unrar x $1	   ;;
-         *.tar)      tar -xvf $1	   ;;
-         *.tbz2)     tar -jxvf $1	;;
-         *.tgz)      tar -zxvf $1	;;
-         *.zip)      unzip $1	      ;;
-         *.Z)        uncompress $1	;;
+         *.rar)      unrar x $1    ;;
+         *.tar)      tar -xvf $1           ;;
+         *.tbz2)     tar -jxvf $1       ;;
+         *.tgz)      tar -zxvf $1       ;;
+         *.zip)      unzip $1         ;;
+         *.Z)        uncompress $1      ;;
          *)          echo "Unable to extract '$1' :: Unknown extension"
       esac
    else
