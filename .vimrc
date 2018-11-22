@@ -14,9 +14,11 @@ Plugin 'mhartington/oceanic-next'
 Plugin 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 Plugin 'zchee/deoplete-go'
 Plugin 'zchee/deoplete-jedi'
+Plugin 'jremmen/vim-ripgrep'
 Plugin 'scrooloose/nerdtree'
 Plugin 'airblade/vim-gitgutter'
 Plugin 'Xuyuanp/nerdtree-git-plugin'
+Plugin 'terryma/vim-multiple-cursors'
 Plugin 'fatih/vim-go'
 Plugin 'rust-lang/rust.vim'
 Plugin 'SirVer/ultisnips'
@@ -62,7 +64,7 @@ colorscheme OceanicNext
 set laststatus=2 " Show status bar by default
 let g:airline_theme='oceanicnext'
 let g:airline_powerline_fonts = 1
-let g:airline#extensions#tabline#enabled = 0 " Enable top tabline
+let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#branch#enabled = 1
 let g:airline_left_sep = ''
 let g:airline_right_sep = ''
@@ -140,72 +142,15 @@ set nocursorcolumn " do not highlight column
 set nocursorline " do not highlight line
 syntax sync minlines=256 " start highlighting from 256 lines backwards
 
-" Quicker window movement
-nnoremap <C-j> <C-w>j
-nnoremap <C-k> <C-w>k
-nnoremap <C-h> <C-w>h
-nnoremap <C-l> <C-w>l
-
 " Visual linewise up and down by default (and use gj gk to go quicker)
 noremap j gj
 noremap k gk
 
-" Some useful quickfix shortcuts
-":cc      see the current error
-":cn      next error
-":cp      previous error
-":clist   list all errors
-map <C-n> :cn<CR>
-map <C-m> :cp<CR>
-
-" Mappings to move lines
-nnoremap <A-j> :m .+1<CR>==
-nnoremap <A-k> :m .-2<CR>==
-inoremap <A-j> <Esc>:m .+1<CR>==gi
-inoremap <A-k> <Esc>:m .-2<CR>==gi
-vnoremap <A-j> :m '>+1<CR>gv=gv
-vnoremap <A-k> :m '<-2<CR>gv=gvj
-
-" Increment/Decrement
-nnoremap <A-a> <C-a>
-nnoremap <A-x> <C-x>
-
-" Save or exit quickly
-nnoremap <leader>w :w!<cr>
-nnoremap <silent> <leader>q :q!<CR>
-
-" Create empty buffers
-nnoremap <C-n> :vnew<CR>
-nnoremap <leader>n :new<CR>
-
-" Creating splits
-nnoremap <leader>v :vsplit<cr>
-nnoremap <leader>h :split<cr>
-
-" Buffer prev/next
-nnoremap <C-x> :bnext<CR>
-nnoremap <C-z> :bprev<CR>
-
-" Breaking the habit
-noremap <Up> <NOP>
-noremap <Down> <NOP>
-noremap <Left> <NOP>
-noremap <Right> <NOP>
-
-" Close quickfix easily
-nnoremap <leader>a :cclose<CR>
-
-" Turn off search highlight
-nnoremap <leader><space> :nohlsearch<CR>
-
-" Matches are highlighted.
-nnoremap <silent> <Enter> :nohl<Enter>
+" Do not show q: window
+map q: :q
 
 " Highlight last inserted text
 nnoremap gV `[v`]
-
-" Do not show q: window
-map q: :q
 
 " Don't highlight the cursor line on the quickfix window
 autocmd BufReadPost quickfix setlocal nocursorline
@@ -263,9 +208,66 @@ function! s:compile_and_run()
     endif
 endfunction
 
+" Breaking the habit
+noremap <Up> <NOP>
+noremap <Down> <NOP>
+noremap <Left> <NOP>
+noremap <Right> <NOP>
+
+" Quicker window movement
+nnoremap <C-j> <C-w>j
+nnoremap <C-k> <C-w>k
+nnoremap <C-h> <C-w>h
+nnoremap <C-l> <C-w>l
+
+" Some useful quickfix shortcuts
+":cc      see the current error
+":cn      next error
+":cp      previous error
+":clist   list all errors
+map <C-n> :cn<CR>
+map <C-m> :cp<CR>
+
+" Mappings to move lines
+nnoremap <A-j> :m .+1<CR>==
+nnoremap <A-k> :m .-2<CR>==
+inoremap <A-j> <Esc>:m .+1<CR>==gi
+inoremap <A-k> <Esc>:m .-2<CR>==gi
+vnoremap <A-j> :m '>+1<CR>gv=gv
+vnoremap <A-k> :m '<-2<CR>gv=gvj
+
+" Increment/Decrement
+nnoremap <A-a> <C-a>
+nnoremap <A-x> <C-x>
+
+" Turn off search highlight
+nnoremap <leader><space> :nohlsearch<CR>
+
+" Close quickfix easily
+nnoremap <leader>a :cclose<CR>
+
+" Matches are highlighted.
+nnoremap <silent> <Enter> :nohl<Enter>
+
+" Buffers
+nnoremap <leader>t :vnew<cr>
+nnoremap <leader>T :enew<cr>
+nnoremap <leader>l :bnext<CR>
+nnoremap <leader>h :bprev<CR>
+nnoremap <leader>bq :bp <BAR> bd #<CR> " Close buffer and move to the previous
+nnoremap <leader>bl :ls<CR> " List open buffers
+
+" Creating splits
+nnoremap <leader>v :vsplit<cr>
+nnoremap <leader>s :split<cr>
+
+" Save or exit quickly
+nnoremap <silent> <leader>w :w!<CR>
+nnoremap <silent> <leader>q :q!<CR>
+
 " NERDTree
-noremap <Leader>n :NERDTreeToggle<cr>
-noremap <Leader>f :NERDTreeFind<cr>
+noremap <leader>n :NERDTreeToggle<cr>
+noremap <leader>nf :NERDTreeFind<cr>
 let NERDTreeShowHidden=1 " Show hidden files
 
 "  Files to ignore
@@ -286,7 +288,7 @@ autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isT
 let g:multi_cursor_use_default_mapping=0
 let g:multi_cursor_next_key='<C-i>'
 let g:multi_cursor_prev_key='<C-y>'
-let g:multi_cursor_skip_key='<C-b>'
+let g:multi_cursor_skip_key='<C-x>'
 let g:multi_cursor_quit_key='<Esc>'
 
 " Called once right before you start selecting multiple cursors
@@ -354,9 +356,6 @@ let g:go_highlight_format_strings = 0
 let g:go_highlight_function_calls = 0
 let g:go_gocode_propose_source = 1
 
-nmap <C-g> :GoDecls<cr>
-imap <C-g> <esc>:<C-u>GoDecls<cr>
-
 " => Run :GoBuild or :GoTestCompile based on the go file
 function! s:build_go_files()
   let l:file = expand('%')
@@ -367,19 +366,36 @@ function! s:build_go_files()
   endif
 endfunction
 
+" create a go doc comment based on the word under the cursor
+" kudos @fatih
+function! s:create_go_doc_comment()
+  norm "zyiw
+  execute ":put! z"
+  execute ":norm I// \<Esc>$"
+endfunction
+
+nmap <C-g> :GoDecls<cr>
+imap <C-g> <esc>:<C-u>GoDecls<cr>
+
 augroup go
   autocmd!
   autocmd FileType go nmap <silent> <leader>b :<C-u>call <SID>build_go_files()<CR>
-  autocmd FileType go nmap <silent> <Leader>c <Plug>(go-coverage-toggle)
-  autocmd FileType go nmap <silent> <Leader>d <Plug>(go-def-tab)
+  autocmd FileType go nmap <silent> <leader>c  <Plug>(go-coverage-toggle)
+  autocmd FileType go nmap <silent> <leader>d  <Plug>(go-def-split)
   autocmd FileType go nmap <silent> <leader>e  <Plug>(go-install)
-  autocmd FileType go nmap <silent> <Leader>i <Plug>(go-info)
-  autocmd FileType go nmap <silent> <Leader>l <Plug>(go-metalinter)
+  autocmd FileType go nmap <silent> <leader>i  <Plug>(go-info)
+  autocmd FileType go nmap <silent> <leader>l  <Plug>(go-metalinter)
   autocmd FileType go nmap <silent> <leader>r  <Plug>(go-run)
-  autocmd FileType go nmap <silent> <Leader>s <Plug>(go-def-split)
-  autocmd FileType go nmap <silent> <leader>t  <Plug>(go-test)
-  autocmd FileType go nmap <silent> <Leader>v <Plug>(go-def-vertical)
-  autocmd FileType go nmap <silent> <Leader>x <Plug>(go-doc-vertical)
+  autocmd FileType go nmap <silent> <leader>dt <Plug>(go-def-tab)
+  autocmd FileType go nmap <silent> <leader>te <Plug>(go-test)
+  autocmd FileType go nmap <silent> <leader>v  <Plug>(go-def-vertical)
+  autocmd FileType go nmap <silent> <leader>ui :<C-u>call <SID>create_go_doc_comment()<CR>
+  autocmd FileType go nmap <silent> <leader>x  <Plug>(go-doc-vertical)
+  if has('nvim')
+    autocmd FileType go nmap <silent> <leader>rt <Plug>(go-run-tab)
+    autocmd FileType go nmap <silent> <leader>rs <Plug>(go-run-split)
+    autocmd FileType go nmap <silent> <leader>rv <Plug>(go-run-vertical)
+  endif
 
   autocmd Filetype go command! -bang A call go#alternate#Switch(<bang>0, 'edit')
   autocmd Filetype go command! -bang AV call go#alternate#Switch(<bang>0, 'vsplit')
@@ -387,28 +403,13 @@ augroup go
   autocmd Filetype go command! -bang AT call go#alternate#Switch(<bang>0, 'tabe')
 augroup END
 
-" create a go doc comment based on the word under the cursor
-function! s:create_go_doc_comment()
-  norm "zyiw
-  execute ":put! z"
-  execute ":norm I// \<Esc>$"
-endfunction
-nnoremap <leader>ui :<C-u>call <SID>create_go_doc_comment()<CR>
-
-if has('nvim')
-  au FileType go nmap <leader>rt <Plug>(go-run-tab)
-  au FileType go nmap <Leader>rs <Plug>(go-run-split)
-  au FileType go nmap <Leader>rv <Plug>(go-run-vertical)
-endif
-
 au BufRead,BufNewFile *.gohtml set filetype=gohtmltmpl
 
 " Completion + Snippet
 let g:SuperTabDefaultCompletionType = "context"
-let g:UltiSnipsExpandTrigger="<tab>"
-let g:UltiSnipsJumpForwardTrigger="<tab>"
-let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
-
+let g:UltiSnipsExpandTrigger = "<tab>"
+let g:UltiSnipsJumpForwardTrigger = "<tab>"
+let g:UltiSnipsJumpBackwardTrigger = "<s-tab>"
 
 " vim-markdown
 let g:vim_markdown_folding_disabled = 1
@@ -423,24 +424,38 @@ let g:vim_markdown_no_extensions_in_markdown = 1
 let g:fzf_command_prefix = 'Fzf'
 let g:fzf_layout = { 'down': '~30%' }
 
-" search
+let g:fzf_action = {
+    \ 'ctrl-t': 'tab split',
+    \ 'ctrl-s': 'split',
+    \ 'ctrl-v': 'vsplit' }
+
+" search history
 nmap <C-p> :FzfHistory<cr>
-imap <C-p> <esc>:<C-u>FzfHistory<cr>
+imap <C-p> <esc>:<C-u>FzfHistory<CR>
 
 " search across files in the current directory
 nmap <C-b> :FzfFiles<cr>
-imap <C-b> <esc>:<C-u>FzfFiles<cr>
+imap <C-b> <esc>:<C-u>FzfFiles<CR>
+
+" tags
+nmap <C-c> :FzfTags<cr>
+imap <C-c> <esc>:<C-u>FzfTags<CR>
 
 let g:rg_command = '
   \ rg --column --line-number --no-heading --fixed-strings --ignore-case --no-ignore --hidden --follow --color "always"
-  \ -g "*.{js,json,php,md,styl,jade,html,config,py,cpp,c,go,hs,rb,conf}"
-  \ -g "!{.git,node_modules,vendor}/*" '
+  \ -g "*.{js,json,php,md,styl,css,jade,html,haml,config,py,cpp,c,go,hs,rb,conf,rs}"
+  \ -g "\!*.{min.js,swp,o,zip,tags}"
+  \ -g "\!{.git,node_modules,vendor}/*" '
 
-command! -bang -nargs=* Rg
+command! -bang -nargs=* FzfRg
   \ call fzf#vim#grep(
-  \   'rg --column --line-number --no-heading --color=always '.shellescape(<q-args>), 1,
-  \   <bang>0 ? fzf#vim#with_preview('up:60%')
-  \           : fzf#vim#with_preview('right:50%:hidden', '?'),
+  \   'rg --line-number --column --no-heading --hidden --ignore-case --follow --color=always '.shellescape(<q-args>), 1,
+  \   <bang>0 ? fzf#vim#with_preview('up:60%:wrap')
+  \           : fzf#vim#with_preview('right:50%:hidden:wrap', '?'),
   \   <bang>0)
 
-command! -bang -nargs=* F call fzf#vim#grep(g:rg_command .shellescape(<q-args>), 1, <bang>0)
+" Search specific
+nmap <C-f> :FzfRg<cr>
+imap <C-f> <esc>:<C-u>FzfRg<CR>
+
+command! -bang -nargs=* FzfFind call fzf#vim#grep(g:rg_command .shellescape(<q-args>), 1, <bang>0)
