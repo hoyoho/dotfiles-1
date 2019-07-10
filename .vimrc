@@ -19,10 +19,9 @@ Plugin 'scrooloose/nerdtree'
 Plugin 'airblade/vim-gitgutter'
 Plugin 'Xuyuanp/nerdtree-git-plugin'
 Plugin 'terryma/vim-multiple-cursors'
-Plugin 'fatih/vim-go'
-Plugin 'rust-lang/rust.vim'
+Plugin 'fatih/vim-go', { 'branch': 'master', 'do': ':GoUpdateBinaries' }
+Plugin 'buoto/gotests-vim'
 Plugin 'SirVer/ultisnips'
-Plugin 'elzr/vim-json', {'for' : 'json'}
 Plugin 'stephpy/vim-yaml'
 Plugin 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --bin' }
 Plugin 'junegunn/fzf.vim'
@@ -35,12 +34,11 @@ Plugin 'plasticboy/vim-markdown'
 Plugin 'ntpeters/vim-better-whitespace'
 Plugin 'ConradIrwin/vim-bracketed-paste'
 Plugin 'ekalinin/Dockerfile.vim', {'for' : 'Dockerfile'}
-Plugin 't9md/vim-choosewin'
 Plugin 'ervandew/supertab'
 Plugin 'MattesGroeger/vim-bookmarks'
 Plugin 'easymotion/vim-easymotion'
-Plugin 'AndrewRadev/splitjoin.vim'
 Plugin 'jiangmiao/auto-pairs'
+Plugin 'editorconfig/editorconfig-vim'
 call vundle#end()
 
 let mapleader="," " leader is comma
@@ -270,6 +268,8 @@ noremap <leader>n :NERDTreeToggle<cr>
 noremap <leader>nf :NERDTreeFind<cr>
 let NERDTreeShowHidden=1 " Show hidden files
 
+noremap pln :pu<CR>
+
 "  Files to ignore
 let NERDTreeIgnore = [
     \ '\.git$',
@@ -334,15 +334,17 @@ let g:go_fmt_command = "goimports"
 let g:go_autodetect_gopath = 1
 let g:go_term_enabled = 1
 let g:go_test_prepend_name = 1
-let g:go_list_type = "quickfix"
-let g:go_info_mode = "gocode"
-let g:go_def_mode = "godef"
+let g:go_info_mode = "gopls"
+let g:go_def_mode = "gopls"
 let g:go_auto_type_info = 0
 let g:go_auto_sameids = 1 " Automatically highlight matching identifiers.
 let g:go_echo_command_info = 1
 
-let g:go_metalinter_enabled = ['vet', 'golint', 'errcheck']
-" let g:go_template_autocreate = 0
+" Use it when supported "https://github.com/golangci/golangci-lint
+let g:go_metalinter_autosave = 1
+let g:go_metalinter_command = "golangci-lint"
+let g:go_metalinter_enabled = ['govet', 'golint', 'errcheck', 'staticcheck']
+let g:go_list_type = 'quickfix'
 
 let g:go_highlight_space_tab_error = 0
 let g:go_highlight_array_whitespace_error = 0
@@ -430,14 +432,23 @@ let g:fzf_action = {
     \ 'ctrl-v': 'vsplit' }
 
 " search history
-nmap <C-p> :FzfHistory<cr>
-imap <C-p> <esc>:<C-u>FzfHistory<CR>
+nmap <silent> <leader>h :FzfHistory<cr>
+imap <silent> <leader>h <esc>:<C-u>FzfHistory<CR>
 
 " search across files in the current directory
-nmap <C-b> :FzfFiles<cr>
-imap <C-b> <esc>:<C-u>FzfFiles<CR>
+nnoremap <C-p> :FzfFiles<cr>
+nnoremap <C-p> <esc>:<C-u>FzfFiles<CR>
 
-" tags
+function! s:find_git_root()
+  return system('git rev-parse --show-toplevel 2> /dev/null')[:-2]
+endfunction
+
+command! ProjectFiles execute 'FzfFiles' s:find_git_root()
+nnoremap <silent> <leader>g :ProjectFiles<cr>
+
+nnoremap <silent> <leader>b :FzfBuffers<cr>
+nnoremap <silent> <leader>b <esc>:<C-u>FzfBuffers<CR>
+
 nmap <C-c> :FzfTags<cr>
 imap <C-c> <esc>:<C-u>FzfTags<CR>
 
@@ -455,7 +466,7 @@ command! -bang -nargs=* FzfRg
   \   <bang>0)
 
 " Search specific
-nmap <C-f> :FzfRg<cr>
-imap <C-f> <esc>:<C-u>FzfRg<CR>
+nmap <silent> <leader>rg :FzfRg<cr>
+imap <silent> <leader>rg <esc>:<C-u>FzfRg<CR>
 
 command! -bang -nargs=* FzfFind call fzf#vim#grep(g:rg_command .shellescape(<q-args>), 1, <bang>0)
