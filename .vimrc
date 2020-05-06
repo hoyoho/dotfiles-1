@@ -3,47 +3,40 @@ set nocompatible " be iMproved, required
 filetype off " required
 filetype plugin indent on " detect file types
 
-" Set the runtime path to include Vundle and initialize
-set rtp+=~/.vim/bundle/Vundle.vim
-call vundle#begin()
-" let Vundle manage Vundle, required
-Plugin 'gmarik/Vundle.vim'
-Plugin 'vim-airline/vim-airline'
-Plugin 'vim-airline/vim-airline-themes'
-Plugin 'mhartington/oceanic-next'
-Plugin 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-Plugin 'zchee/deoplete-go'
-Plugin 'zchee/deoplete-jedi'
-Plugin 'jremmen/vim-ripgrep'
-Plugin 'scrooloose/nerdtree'
-Plugin 'airblade/vim-gitgutter'
-Plugin 'Xuyuanp/nerdtree-git-plugin'
-Plugin 'terryma/vim-multiple-cursors'
-Plugin 'fatih/vim-go', { 'branch': 'master', 'do': ':GoUpdateBinaries' }
-Plugin 'buoto/gotests-vim'
-Plugin 'SirVer/ultisnips'
-Plugin 'stephpy/vim-yaml'
-Plugin 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --bin' }
-Plugin 'junegunn/fzf.vim'
-Plugin 'christoomey/vim-tmux-navigator'
-Plugin 'tpope/vim-fugitive'
-Plugin 'tpope/vim-surround'
-Plugin 'vim-pandoc/vim-pandoc'
-Plugin 'godlygeek/tabular'
-Plugin 'plasticboy/vim-markdown'
-Plugin 'ntpeters/vim-better-whitespace'
-Plugin 'ConradIrwin/vim-bracketed-paste'
-Plugin 'ekalinin/Dockerfile.vim', {'for' : 'Dockerfile'}
-Plugin 'ervandew/supertab'
-Plugin 'MattesGroeger/vim-bookmarks'
-Plugin 'easymotion/vim-easymotion'
-Plugin 'jiangmiao/auto-pairs'
-Plugin 'editorconfig/editorconfig-vim'
-call vundle#end()
+call plug#begin('~/.vim/plugged')
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
+Plug 'mhartington/oceanic-next'
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --bin' }
+Plug 'junegunn/fzf.vim'
+Plug 'airblade/vim-gitgutter'
+Plug 'terryma/vim-multiple-cursors'
+Plug 'fatih/vim-go', { 'branch': 'master', 'do': ':GoUpdateBinaries' }
+Plug 'buoto/gotests-vim'
+Plug 'SirVer/ultisnips'
+Plug 'stephpy/vim-yaml'
+Plug 'jremmen/vim-ripgrep'
+Plug 'christoomey/vim-tmux-navigator'
+Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-surround'
+Plug 'tpope/vim-eunuch'
+Plug 'godlygeek/tabular'
+Plug 'plasticboy/vim-markdown'
+Plug 'ntpeters/vim-better-whitespace'
+Plug 'ConradIrwin/vim-bracketed-paste'
+Plug 'ekalinin/Dockerfile.vim', {'for' : 'Dockerfile'}
+Plug 'MattesGroeger/vim-bookmarks'
+Plug 'editorconfig/editorconfig-vim'
+Plug 'Raimondi/delimitMate'
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+call plug#end()
 
 let mapleader="," " leader is comma
 
 set clipboard=unnamed " use one clipboard
+
+" Automatically resize screens to be equally the same
+autocmd VimResized * wincmd =
 
 " Colorscheme
 syntax on
@@ -91,6 +84,9 @@ set ruler " Show the cursor position all the time
 set mouse=a " Enable mouse inside vim
 set completeopt-=preview " remove the preview window
 set number relativenumber " set hybrid relative line numbers
+set cmdheight=2 " Better display for messages
+set updatetime=300 " You will have bad experience for coc diagnostic messages when it's default 4000.
+set signcolumn=yes " always show signcolumns
 
 augroup numbertoggle
   autocmd!
@@ -140,9 +136,12 @@ set nocursorcolumn " do not highlight column
 set nocursorline " do not highlight line
 syntax sync minlines=256 " start highlighting from 256 lines backwards
 
+
 " Visual linewise up and down by default (and use gj gk to go quicker)
 noremap j gj
 noremap k gk
+
+noremap % v%
 
 " Do not show q: window
 map q: :q
@@ -153,32 +152,14 @@ nnoremap gV `[v`]
 " Don't highlight the cursor line on the quickfix window
 autocmd BufReadPost quickfix setlocal nocursorline
 
-" Python settings
-au FileType python set expandtab
-au FileType python set smarttab
-au FileType python set shiftwidth=2
-au FileType python set softtabstop=2
-au FileType python set tabstop=2
-
-" Go settings
-au FileType go set noexpandtab
-au FileType go set shiftwidth=4
-au FileType go set softtabstop=4
-au FileType go set tabstop=4
-
-" YAML settings
-au FileType yaml set expandtab
-au FileType yaml set shiftwidth=2
-au FileType yaml set softtabstop=2
-au FileType yaml set tabstop=2
-
-" Markdown settings
-au FileType markdown set expandtab
-au FileType markdown set shiftwidth=4
-au FileType markdown set softtabstop=4
-au FileType markdown set tabstop=4
-au FileType markdown set syntax=markdown
-
+" Highlighting
+autocmd FileType go setlocal noexpandtab tabstop=4 shiftwidth=4 softtabstop=4
+autocmd FileType yaml setlocal expandtab shiftwidth=2 tabstop=2
+autocmd FileType json setlocal expandtab shiftwidth=2 tabstop=2
+autocmd FileType json syntax match Comment +\/\/.\+$+
+autocmd FileType python setlocal expandtab smarttab shiftwidth=2  softtabstop=2 tabstop=2
+autocmd FileType markdown setlocal expandtab smarttab shiftwidth=4  softtabstop=4 tabstop=4 syntax=markdown
+autocmd Filetype gitcommit setlocal spell textwidth=72
 " Tmux
 autocmd BufNewFile,BufRead .tmux.conf*,tmux.conf* setf tmux
 
@@ -250,10 +231,10 @@ nnoremap <silent> <Enter> :nohl<Enter>
 " Buffers
 nnoremap <leader>t :vnew<cr>
 nnoremap <leader>T :enew<cr>
-nnoremap <leader>l :bnext<CR>
-nnoremap <leader>h :bprev<CR>
-nnoremap <leader>bq :bp <BAR> bd #<CR> " Close buffer and move to the previous
-nnoremap <leader>bl :ls<CR> " List open buffers
+map gn :bn<cr>
+map gp :bp<cr>
+map gd :bd<cr>
+map gl :ls<cr>
 
 " Creating splits
 nnoremap <leader>v :vsplit<cr>
@@ -262,27 +243,6 @@ nnoremap <leader>s :split<cr>
 " Save or exit quickly
 nnoremap <silent> <leader>w :w!<CR>
 nnoremap <silent> <leader>q :q!<CR>
-
-" NERDTree
-noremap <leader>n :NERDTreeToggle<cr>
-noremap <leader>nf :NERDTreeFind<cr>
-let NERDTreeShowHidden=1 " Show hidden files
-
-noremap pln :pu<CR>
-
-"  Files to ignore
-let NERDTreeIgnore = [
-    \ '\.git$',
-    \ '\.vim$',
-    \ '\~$',
-    \ '\.pyc$',
-    \ '^\.DS_Store$',
-    \ '^node_modules$',
-    \ '^.ropeproject$',
-    \ '^__pycache__$'
-\]
-" Close vim if the only window left open is a NERDTree
-autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 
 " vim-multiple-cursor
 let g:multi_cursor_use_default_mapping=0
@@ -305,22 +265,52 @@ function! Multiple_cursors_after()
   endif
 endfunction
 
-" Deoplete
-if has('nvim')
-  let g:deoplete#enable_at_startup = 1
-  let g:deoplete#ignore_sources = {}
-  let g:deoplete#ignore_sources._ = ['buffer', 'member', 'tag', 'file', 'neosnippet']
-  let g:deoplete#sources#go#sort_class = ['func', 'type', 'var', 'const']
-  let g:deoplete#sources#go#align_class = 1
+" coc-nvim
+" Use tab for trigger completion with characters ahead and navigate.
+" Use command ':verbose imap <tab>' to make sure tab is not mapped by other plugin.
+inoremap <silent><expr> <TAB>
+      \ pumvisible() ? "\<C-n>" :
+      \ <SID>check_back_space() ? "\<TAB>" :
+      \ coc#refresh()
+inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
 
-  " Use partial fuzzy matches like YouCompleteMe
-  call deoplete#custom#source('_', 'matchers', ['matcher_fuzzy'])
-  call deoplete#custom#source('_', 'converters', ['converter_remove_paren'])
-  call deoplete#custom#source('_', 'disabled_syntaxes', ['Comment', 'String'])
-endif
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
 
- " <TAB>: completion.
-inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
+" Use <c-space> to trigger completion.
+inoremap <silent><expr> <c-space> coc#refresh()
+
+" Use <cr> to confirm completion, `<C-g>u` means break undo chain at current position.
+" Coc only does snippet and additional edit on confirm.
+inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+" Or use `complete_info` if your vim support it, like:
+" inoremap <expr> <cr> complete_info()["selected"] != "-1" ? "\<C-y>" : "\<C-g>u\<CR>"
+
+" Use `[g` and `]g` to navigate diagnostics
+nmap <silent> [g <Plug>(coc-diagnostic-prev)
+nmap <silent> ]g <Plug>(coc-diagnostic-next)
+
+" Remap keys for gotos
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
+
+" Use K to show documentation in preview window
+nnoremap <silent> K :call <SID>show_documentation()<CR>
+
+function! s:show_documentation()
+  if (index(['vim','help'], &filetype) >= 0)
+    execute 'h '.expand('<cword>')
+  else
+    call CocAction('doHover')
+  endif
+endfunction
+
+" Highlight symbol under cursor on CursorHold
+autocmd CursorHold * silent call CocActionAsync('highlight')
 
 " vim-choosewin
 " invoke with '-'
@@ -329,36 +319,41 @@ nmap  -  <Plug>(choosewin)
 " vim-go
 set rtp+=$GOPATH/src/github.com/golang/lint/misc/vim
 
-let g:go_fmt_fail_silently = 0
+let g:go_fmt_fail_silently = 1
 let g:go_fmt_command = "goimports"
 let g:go_autodetect_gopath = 1
-let g:go_term_enabled = 1
 let g:go_test_prepend_name = 1
-let g:go_info_mode = "gopls"
-let g:go_def_mode = "gopls"
+let g:go_term_enabled = 1
 let g:go_auto_type_info = 0
 let g:go_auto_sameids = 1 " Automatically highlight matching identifiers.
 let g:go_echo_command_info = 1
+let g:go_term_close_on_exit = 0
+let g:go_null_module_warning = 0
 
-" Use it when supported "https://github.com/golangci/golangci-lint
 let g:go_metalinter_autosave = 1
-let g:go_metalinter_command = "golangci-lint"
-let g:go_metalinter_enabled = ['govet', 'golint', 'errcheck', 'staticcheck']
+let g:go_metalinter_autosave_enabled=['govet', 'golint']
 let g:go_list_type = 'quickfix'
+let g:go_metalinter_command = "golangci-lint"
+let g:go_metalinter_enabled = ['govet', 'unused', 'structcheck', 'varcheck', 'deadcode', 'typecheck', 'errcheck', 'staticcheck', "unconvert", "gosec", "gocognit", "wsl", "gosimple", "dupl", "bodyclose", "goconst"]
 
 let g:go_highlight_space_tab_error = 0
 let g:go_highlight_array_whitespace_error = 0
 let g:go_highlight_trailing_whitespace_error = 0
 let g:go_highlight_extra_types = 0
-let g:go_highlight_operators = 0
 let g:go_highlight_build_constraints = 1
 let g:go_highlight_types = 0
 let g:go_highlight_operators = 1
 let g:go_highlight_format_strings = 0
 let g:go_highlight_function_calls = 0
 let g:go_gocode_propose_source = 1
+let g:go_modifytags_transform = 'camelcase'
 
-" => Run :GoBuild or :GoTestCompile based on the go file
+let g:go_debug_windows = {
+      \ 'vars':  'leftabove 35vnew',
+      \ 'stack': 'botright 10new',
+      \ }
+
+" run :GoBuild or :GoTestCompile based on the go file
 function! s:build_go_files()
   let l:file = expand('%')
   if l:file =~# '^\f\+_test\.go$'
@@ -409,6 +404,7 @@ au BufRead,BufNewFile *.gohtml set filetype=gohtmltmpl
 
 " Completion + Snippet
 let g:SuperTabDefaultCompletionType = "context"
+let g:SuperTabContextTextOmniPrecedence = ['&omnifunc', '&completefunc']
 let g:UltiSnipsExpandTrigger = "<tab>"
 let g:UltiSnipsJumpForwardTrigger = "<tab>"
 let g:UltiSnipsJumpBackwardTrigger = "<s-tab>"
@@ -424,11 +420,11 @@ let g:vim_markdown_no_extensions_in_markdown = 1
 
 " FZF
 let g:fzf_command_prefix = 'Fzf'
-let g:fzf_layout = { 'down': '~30%' }
+let g:fzf_layout = { 'down': '~20%' }
 
 let g:fzf_action = {
     \ 'ctrl-t': 'tab split',
-    \ 'ctrl-s': 'split',
+    \ 'ctrl-x': 'split',
     \ 'ctrl-v': 'vsplit' }
 
 " search history
@@ -439,15 +435,17 @@ imap <silent> <leader>h <esc>:<C-u>FzfHistory<CR>
 nnoremap <C-p> :FzfFiles<cr>
 nnoremap <C-p> <esc>:<C-u>FzfFiles<CR>
 
-function! s:find_git_root()
-  return system('git rev-parse --show-toplevel 2> /dev/null')[:-2]
-endfunction
-
-command! ProjectFiles execute 'FzfFiles' s:find_git_root()
-nnoremap <silent> <leader>g :ProjectFiles<cr>
+" search across git files
+nnoremap <silent> <leader>gf :FzfGFiles<cr>
 
 nnoremap <silent> <leader>b :FzfBuffers<cr>
 nnoremap <silent> <leader>b <esc>:<C-u>FzfBuffers<CR>
+
+command! ProjectFiles execute 'FzfFiles' s:find_git_root()
+function! s:find_git_root()
+  return system('git rev-parse --show-toplevel 2> /dev/null')[:-2]
+endfunction
+nnoremap <silent> <leader>pf :ProjectFiles<cr>
 
 nmap <C-c> :FzfTags<cr>
 imap <C-c> <esc>:<C-u>FzfTags<CR>
@@ -470,3 +468,12 @@ nmap <silent> <leader>rg :FzfRg<cr>
 imap <silent> <leader>rg <esc>:<C-u>FzfRg<CR>
 
 command! -bang -nargs=* FzfFind call fzf#vim#grep(g:rg_command .shellescape(<q-args>), 1, <bang>0)
+
+" Restore the last cursor position when opening files.
+function! RestoreCursor()
+  if line("'\"") <= line("$")
+    normal! g`"
+    return 1
+  endif
+endfunction
+autocmd BufReadPost * call RestoreCursor()
