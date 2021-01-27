@@ -1,10 +1,31 @@
 [user]
     name = Pavlos Ratis
-    email = dastergon@gentoo.org
-    signingkey = 3A051746
+    email = dastergon@gmail.com
 [core]
-    editor = vim
+    editor = nvim
 [color]
     ui = true
 [push]
     default = simple
+
+[alias]
+    pacp = "!f() { git pull origin master && git add -A && git commit -m \"$@\" && git push; }; f"
+    glog = log --all --pretty='format:%d %Cgreen%h%Creset %an - %s' --graph
+    s = status --short --branch --ignore-submodules=untracked
+    find = log --pretty=\"format:%Cgreen%H\n%s\n\n%b\" --name-status --grep
+    amend = commit --amend --no-edit
+    undo = reset HEAD~
+    upload = "!git push pratis $(git rev-parse --abbrev-ref HEAD)"
+    prune = "!git co master && git branch --merged | grep -v '\\*' | xargs -n 1 git branch -d"
+    delete = branch -D
+    pr = "!git fetch origin pull/$1/head:pr$1"
+    sync = "!git pull -q -r origin master"
+
+[core]
+   pager = /usr/local/share/git-core/contrib/diff-highlight/diff-highlight | less
+   
+[color "diff-highlight"]
+  oldNormal = red bold
+  oldHighlight = red bold 52
+  newNormal = green bold
+  newHighlight = green bold 22
