@@ -11,7 +11,7 @@ Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --bin' }
 Plug 'junegunn/fzf.vim'
 Plug 'airblade/vim-gitgutter'
 Plug 'terryma/vim-multiple-cursors'
-Plug 'fatih/vim-go', { 'branch': 'master', 'do': ':GoUpdateBinaries' }
+Plug 'fatih/vim-go'
 Plug 'buoto/gotests-vim'
 Plug 'SirVer/ultisnips'
 Plug 'stephpy/vim-yaml'
