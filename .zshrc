@@ -1,8 +1,10 @@
 #!/bin/env zsh
 
+eval "$(starship init zsh)"
+
 if [ "$TMUX" = "" ]; then tmux; fi
 
-source /usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 
 # Aliases
 alias vim='nvim'
@@ -22,14 +24,7 @@ export CC=gcc
 export PAGER="less"
 export EDITOR="nvim"
 export LESS="-R"
-
 export PATH="/usr/local/sbin:$PATH"
-
-# Go specific env vars
-export GOPATH=$HOME/go
-export GOROOT=/usr/local/opt/go/libexec
-export PATH=$PATH:$GOPATH/bin
-export PATH=$PATH:$GOROOT/bin
 
 # History
 HISTSIZE=1500
@@ -43,6 +38,7 @@ setopt extendedglob
 
 # Key bindnings
 bindkey -e
+
 # Option-Right
 bindkey '\e\e[C' forward-word
 # Option-Left
@@ -55,21 +51,6 @@ setopt auto_name_dirs
 
 autoload -U promptinit; promptinit
 autoload -U colors; colors
-
-# PROMPT
-SPACESHIP_PROMPT_ORDER=(
-  #time
-  #user
-  #host
-  dir
-  git
-  #line_sep
-  char
-)
-
-SPACESHIP_TIME_SHOW=true
-# Set Spaceship ZSH as a prompt
-prompt spaceship
 
 # Appearance
 zstyle ':completion:*' completer _expand _complete _ignored _correct _approximate
@@ -139,9 +120,4 @@ fzf_then_open_in_editor() {
 }
 zle -N fzf_then_open_in_editor
 bindkey "^O" fzf_then_open_in_editor
-
-# kubectl autocomplete
-if [ $commands[kubectl] ]; then
-  source <(kubectl completion zsh)
-fi
 
